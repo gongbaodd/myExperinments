@@ -1,0 +1,16 @@
+console.log("%c    别踩雷区","font-family:'黑体';font-size:81px;background:url('http://img.article.pchome.net/00/44/30/18/pic_lib/wm/20071221161139232.jpg') no-repeat 0 -25px");
+console.log("HTML5 DragAPI的实现%c来自:console","color:red;font-weight:bold;");
+console.group("%c<简要说明/>","font-family:'黑体';font-size:25px;font-weight:bold;");
+console.info("拖动Doge，必须在不经过雷区的情况下，到达OK，也不能停下，否则失败。");
+console.groupEnd();
+console.group("%c<代码说明/>","font-family:'黑体';font-size:25px;font-weight:bold;");
+console.info("创建可拖动内容：");
+console.log('   标签内添加draggabe="true",图片默认可拖动');
+console.info("拖动事件：");
+console.log("   dragstart");
+console.log("   drag");
+console.log("   dragenter");
+console.log("   dragleave");
+console.log("   dragover");
+console.log("   drop");
+console.log("   dragend");
