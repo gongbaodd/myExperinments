@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>lesson 1</title>
+    <title>lesson 2</title>
     <script src="./libs/three.js"></script>
     <script src="./libs/stats.js"></script>
     <script src="./libs/dat.gui.js"></script>
@@ -18,15 +18,16 @@
    <div id="Stats-output"></div>
     <div id="WebGL-output"></div>
     <script>
-        var camera,scene,renderer;
-
         function init () {
             var stats = initStats();
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
-            renderer = new THREE.WebGLRenderer();
 
-            renderer.setClearColorHex();
+            var scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0xffffff,0.015,100);
+            scene.overrideMaterial = new THREE.MeshLambertMaterial({color:0xffffff});
+
+            var camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
+            var renderer = new THREE.WebGLRenderer();
+
             renderer.setClearColor(new THREE.Color(0xEEEEEE));
             renderer.setSize(window.innerWidth,window.innerHeight);
             renderer.shadowMapEnabled = true;
@@ -45,28 +46,6 @@
             plane.position.z =0;
 
             scene.add(plane);
-
-            var cubeGeometry = new THREE.BoxGeometry(4,4,4);
-            var cubeMaterial = new THREE.MeshLambertMaterial({color:0xff0000,wireframe:false});
-            var cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
-
-            cube.position.x = -4;
-            cube.position.y = 3;
-            cube.position.z = 0;
-            cube.castShadow = true;
-
-            scene.add(cube);
-
-            var sphereGeometry = new THREE.SphereGeometry(4,20,20);
-            var sphereMaterial = new THREE.MeshLambertMaterial({color:0x7777ff,wireframe:false});
-            var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
-
-            sphere.position.x = 20;
-            sphere.position.y = 4;
-            sphere.position.z = 2;
-            sphere.castShadow = true;
-
-            scene.add(sphere);
 
             camera.position.x = -30;
             camera.position.y = 40;
@@ -87,25 +66,57 @@
 
             var controls = new function () {
                 this.rotationSpeed = 0.02;
-                this.bouncingSpeed = 0.03;
+                this.numberOfObjects =scene.children.length;
+
+                this.removeCube = function () {
+                    var allChildren = scene.children;
+                    var lastObject = allChildren[allChildren.length -1 ];
+                    if(lastObject instanceof THREE.Mesh) {
+                        scene.remove(lastObject);
+                        this.numberOfObjects = scene.children.length;
+                    }
+                };
+
+                this.addCube = function () {
+                    var cubeSize = Math.ceil(Math.random() * 3);
+                    var cubeGeometry = new THREE.BoxGeometry(cubeSize,cubeSize,cubeSize);
+                    var cubeMaterial = new THREE.MeshLambertMaterial({color:Math.random() * 0xffffff});
+                    var cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+                    cube.castShadow = true;
+                    cube.name = "cube-" + scene.children.length;
+
+                    cube.position.x = -30 + Math.round(Math.random() * planeGeometry.parameters.width);
+                    cube.position.y = Math.round(Math.random() * 5);
+                    cube.position.z = -20 + Math.round(Math.random() * planeGeometry.parameters.height);
+
+                    scene.add(cube);
+                    this.numberOfObjects = scene.children.length;
+                }
+                this.outputObjects = function () {
+                    console.log(scene.children);
+                }
             };
 
             var gui = new dat.GUI();
             gui.add(controls,'rotationSpeed',0,0.5);
-            gui.add(controls,'bouncingSpeed',0,0.5);
+            gui.add(controls,'addCube');
+            gui.add(controls,'removeCube');
+            gui.add(controls,'outputObjects');
+            gui.add(controls,'numberOfObjects').listen();
 
             renderScene();
 
 //            renderer.render(scene,camera);
             function renderScene() {
                 stats.update();
-                cube.rotation.x += controls.rotationSpeed;
-                cube.rotation.y += controls.rotationSpeed;
-                cube.rotation.z += controls.rotationSpeed;
 
-                steps += controls.bouncingSpeed;
-                sphere.position.x = 20 + ( 10*(Math.cos(steps)));
-                sphere.position.y = 2 + ( 10*Math.abs(Math.sin(steps)));
+                scene.traverse(function (e) {
+                    if(e instanceof THREE.Mesh && e!=plane) {
+                        e.rotation.x += controls.rotationSpeed;
+                        e.rotation.y += controls.rotationSpeed;
+                        e.rotation.z += controls.rotationSpeed;
+                    }
+                })
 
                 requestAnimationFrame(renderScene);
                 renderer.render(scene,camera);
