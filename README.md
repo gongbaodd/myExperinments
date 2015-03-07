@@ -1,4 +1,0 @@
-imooc
-=====
-
-learning in imooc
