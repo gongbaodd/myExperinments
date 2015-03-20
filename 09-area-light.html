@@ -26,6 +26,49 @@
     </style>
 </head>
 <body>
+    <script>
+        var camera;
+        function init() {
+            var stats = initStats();
 
+            var scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1 , 1000 );
+
+            scene.add(camera);
+
+            var renderer = new THREE.WebGLDeferredRenderer({
+                width:window.innerWidth,
+                height:window.innerHeight,
+                scale:1,antialias:true,
+                tonemapping:THREE.FilmicOperator,
+                brightness:2.5
+            });
+
+            var planeGeometry = new THREE.PlaneGeometry(70,70,1,1);
+            var planeMaterial = new THREE.MeshPhongMaterial({color:0xffffff,specular:0xffffff,shininess:200});
+            var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+
+            plane.rotation.x = -0.5*Math.PI;
+            plane.position.x = 0;
+            plane.position.y = 0;
+            plane.position.z = 0;
+
+            scene.add(plane);
+
+            camera.position.x = 20;
+            camera.position.y = 30;
+            camera.position.z = 21;
+            camera.lookAt(new THREE.Vector3(0,0,-30));
+
+            document.getElementById("WebGL-output").appendChild(renderer.domElement);
+
+            var step = 0;
+            var spotLight0 = new THREE.SpotLight(0xcccccc);
+            spotLight0.position.set(-40,60,-10);
+            spotLight0.intensity = 0.1;
+
+        }
+    </script>
 </body>
 </html>
